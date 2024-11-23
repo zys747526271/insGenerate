@@ -10,7 +10,41 @@
 - 支持自定义标题和作者
 - 美观的进度显示
 
-## 使用说明
+## 快速开始
+
+### 安装
+
+1. 克隆项目：
+```bash
+git clone https://github.com/kakaoxy/insGenerate.git
+cd insGenerate
+```
+
+2. 安装依赖：
+```bash
+pip install -r requirements.txt
+```
+
+### 基本使用
+
+1. 准备视频链接文件（links.txt）：
+```
+https://www.instagram.com/reel/xxx
+https://www.instagram.com/reel/yyy
+https://www.instagram.com/reel/zzz
+```
+
+2. 下载视频：
+```bash
+python video_downloader.py -i links.txt -o ./11-23
+```
+
+3. 合并视频：
+```bash
+python video_merger.py -i "11-23" -o "11-23-final.mp4"
+```
+
+## 详细使用说明
 
 ### 1. 视频下载器 (video_downloader.py)
 
@@ -31,7 +65,7 @@ python video_downloader.py [选项]
 # 基本使用
 python video_downloader.py -i links.txt -o ./downloads
 
-# 使用Cookie文件
+# 使用Cookie文件（推荐，避免访问限制）
 python video_downloader.py -i links.txt -o ./downloads -c cookies.txt
 ```
 
@@ -83,19 +117,26 @@ python video_merger.py --test
 
 - Python 3.x
 - Windows操作系统
-- 必要的Python包：
-  - moviepy
-  - Pillow (PIL)
-  - requests
-  - datetime
-  - logging
-  - argparse
+- 必要的Python包（见 requirements.txt）
 
-## 安装依赖
+## 开发相关
 
-```bash
-pip install moviepy pillow requests
+### 目录结构
 ```
+insGenerate/
+├── video_downloader.py  # 视频下载器
+├── video_merger.py      # 视频合并器
+├── requirements.txt     # 项目依赖
+├── .gitignore          # Git忽略配置
+└── README.md           # 说明文档
+```
+
+### Git提交规范
+
+提交信息格式：
+- 功能更新：`feat: add video merger transition screens`
+- 修复问题：`fix: resolve video download timeout issue`
+- 文档更新：`docs: update README with usage examples`
 
 ## 注意事项
 
@@ -128,3 +169,19 @@ pip install moviepy pillow requests
 - 添加视频合并功能
 - 支持自定义过渡画面
 - 添加命令行参数支持
+
+## 贡献指南
+
+1. 感谢yt-dlp ：`https://github.com/yt-dlp/yt-dlp.git`
+2. 感谢moviepy：`https://github.com/Zulko/moviepy.git`
+3. 感谢ffmpeg-python：`https://github.com/kkroening/ffmpeg-python.git`
+
+感谢windsurf：项目全程使用windsurf搭建，没有任何手写代码
+
+
+
+
+
+## 许可证
+
+MIT License
