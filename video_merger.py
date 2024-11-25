@@ -23,6 +23,40 @@ logging.basicConfig(
 logging.getLogger('PIL').setLevel(logging.WARNING)
 logging.getLogger('moviepy').setLevel(logging.WARNING)
 
+# 颜色方案配置
+COLOR_SCHEMES = {
+    'p1': {  # 经典黑白
+        'background': '#FFFFFF',
+        'text': '#333333',
+        'name': '经典黑白'
+    },
+    'p2': {  # 柔和灰白
+        'background': '#F5F5F5',
+        'text': '#2C3E50',
+        'name': '柔和灰白'
+    },
+    'p3': {  # 暖色调
+        'background': '#FFF8F0',
+        'text': '#8B4513',
+        'name': '暖色调'
+    },
+    'p4': {  # 冷色调
+        'background': '#F0F8FF',
+        'text': '#1B4F72',
+        'name': '冷色调'
+    },
+    'p5': {  # 现代灰白
+        'background': '#333333',
+        'text': '#FFFFFF',
+        'name': '现代灰白'
+    },
+    'p6': {  # 经典白黑
+        'background': '#000000',
+        'text': '#FFFFFF',
+        'name': '经典白黑'
+    }
+}
+
 @contextmanager
 def managed_resource(resource, resource_type="resource"):
     """资源管理器，确保资源被正确释放"""
@@ -50,12 +84,17 @@ def managed_resource(resource, resource_type="resource"):
             except Exception as e:
                 logging.debug(f"Error closing {resource_type}: {str(e)}")
 
-def create_number_transition(number, duration=1.0, size=(720, 1280), is_final=False, video_count=None, title_text="今日份快乐", author_name=""):
+def create_number_transition(number, duration=1.0, size=(720, 1280), is_final=False, video_count=None, title_text="今日份快乐", author_name="", color_scheme='p6'):
     """创建带数字的过渡画面"""
     try:
-        # 创建黑色背景
+        # 获取颜色方案
+        scheme = COLOR_SCHEMES.get(color_scheme, COLOR_SCHEMES['p6'])
+        bg_color = scheme['background']
+        text_color = scheme['text']
+        
+        # 创建背景
         width, height = size
-        background = Image.new('RGB', (width, height), 'black')
+        background = Image.new('RGB', (width, height), bg_color)
         draw = ImageDraw.Draw(background)
         
         if not is_final:
@@ -65,7 +104,7 @@ def create_number_transition(number, duration=1.0, size=(720, 1280), is_final=Fa
                 font = ImageFont.truetype("arial.ttf", 80)
             except:
                 font = ImageFont.load_default()
-                
+            
             # 计算文字大小和位置
             text = str(number)
             bbox = draw.textbbox((0, 0), text, font=font)
@@ -87,7 +126,7 @@ def create_number_transition(number, duration=1.0, size=(720, 1280), is_final=Fa
                 circle_x + circle_radius,
                 circle_y + circle_radius
             ]
-            draw.ellipse(circle_bbox, outline='white', width=5)
+            draw.ellipse(circle_bbox, outline=text_color, width=5)
             
             # 计算文字的精确位置，考虑字体的基线偏移
             text_offset = (ascent - descent) // 2  # 考虑字体的基线偏移
@@ -95,7 +134,7 @@ def create_number_transition(number, duration=1.0, size=(720, 1280), is_final=Fa
             text_y = circle_y - text_height // 2 - text_offset // 2  # 微调垂直位置
             
             # 绘制数字
-            draw.text((text_x, text_y), text, font=font, fill='white')
+            draw.text((text_x, text_y), text, font=font, fill=text_color)
             
             # 只在第一个过渡画面显示作者名称
             if number == 1 and author_name:
@@ -115,7 +154,7 @@ def create_number_transition(number, duration=1.0, size=(720, 1280), is_final=Fa
                 author_y = circle_y + circle_radius + text_height + 320  # 在数字下方20像素处
                 
                 # 绘制作者名称
-                draw.text((author_x, author_y), author_text, font=author_font, fill="white")
+                draw.text((author_x, author_y), author_text, font=author_font, fill=text_color)
             
             # 如果是第一个画面，添加标题
             if number == 1:
@@ -158,19 +197,19 @@ def create_number_transition(number, duration=1.0, size=(720, 1280), is_final=Fa
                     # 绘制边框
                     draw.rectangle(
                         [box_x, box_y, box_x + box_width, box_y + box_height],
-                        outline='white',
+                        outline=text_color,
                         width=3
                     )
                     
                     # 在边框内居中绘制日期
                     date_x = (width - date_width) // 2
                     date_y = box_y + padding
-                    draw.text((date_x, date_y), date_text, font=title_font, fill='white')
+                    draw.text((date_x, date_y), date_text, font=title_font, fill=text_color)
                     
                     # 在日期下方居中绘制标题
                     title_x = (width - title_width) // 2
                     title_y = date_y + title_height + padding  # 日期下方padding像素
-                    draw.text((title_x, title_y), title_text, font=title_font, fill='white')
+                    draw.text((title_x, title_y), title_text, font=title_font, fill=text_color)
                     
                 except Exception as e:
                     logging.warning(f"添加标题失败: {str(e)}")
@@ -195,7 +234,7 @@ def create_number_transition(number, duration=1.0, size=(720, 1280), is_final=Fa
                 text_x = (width - text_width) // 2
                 
                 # 绘制文字
-                draw.text((text_x, text_height), text, font=font, fill='white')
+                draw.text((text_x, text_height), text, font=font, fill=text_color)
                 text_height += 150  # 行间距
         
         # 保存图片
@@ -218,7 +257,7 @@ def create_number_transition(number, duration=1.0, size=(720, 1280), is_final=Fa
         logging.error(f"创建过渡画面时出错: {str(e)}")
         return None
 
-def merge_videos(input_dir=None, output_path=None, title="今日份快乐", author=""):
+def merge_videos(input_dir=None, output_path=None, title="今日份快乐", author="", color_scheme='p6'):
     """合并视频文件，添加过渡画面"""
     try:
         # 设置默认值并转换为绝对路径
@@ -277,7 +316,7 @@ def merge_videos(input_dir=None, output_path=None, title="今日份快乐", auth
                 logging.info(f"\n步骤 1/2: 创建过渡画面")
                 transition = create_number_transition(i, duration=1.0, size=(720, 1280), 
                                                    is_final=False, video_count=video_count, 
-                                                   title_text=title, author_name=author if i == 1 else "")
+                                                   title_text=title, author_name=author if i == 1 else "", color_scheme=color_scheme)
                 if transition is None:
                     raise Exception("过渡画面创建失败")
                 clips.append(transition)
@@ -314,7 +353,7 @@ def merge_videos(input_dir=None, output_path=None, title="今日份快乐", auth
                 # 如果是最后一个视频，添加最终过渡画面
                 if i == video_count:
                     logging.info("\n添加最终过渡画面")
-                    final_transition = create_number_transition(i+1, duration=1.0, size=(720, 1280), is_final=True)
+                    final_transition = create_number_transition(i+1, duration=1.0, size=(720, 1280), is_final=True, color_scheme=color_scheme)
                     if final_transition is None:
                         raise Exception("最终过渡画面创建失败")
                     clips.append(final_transition)
@@ -447,54 +486,71 @@ def test_transition():
 if __name__ == "__main__":
     import argparse
     
-    # 创建命令行参数解析器
-    parser = argparse.ArgumentParser(description='合并视频并添加过渡画面')
-    parser.add_argument('--input', '-i', help='输入视频目录路径', default=None)
-    parser.add_argument('--output', '-o', help='输出视频文件路径', default=None)
-    parser.add_argument('--title', '-t', help='标题文本', default="今日份快乐")
-    parser.add_argument('--author', '-a', help='作者名称', default="Cynvann")
+    parser = argparse.ArgumentParser(description='视频合并工具')
+    parser.add_argument('--input_dir', '-i', type=str, help='输入视频文件夹路径')
+    parser.add_argument('--output_path', '-o', type=str, help='输出视频文件名（将保存在输入目录中）')
+    parser.add_argument('--title', '-t', type=str, default="今日份快乐", help='视频标题')
+    parser.add_argument('--author', '-a', type=str, default="Cynvann", help='作者名称')
+    parser.add_argument('--color_scheme', '-c', type=str, choices=['p1', 'p2', 'p3', 'p4', 'p5', 'p6'], 
+                      default='p6', help='颜色方案选择：\n' + '\n'.join([f"{k}: {v['name']}" for k, v in COLOR_SCHEMES.items()]))
     parser.add_argument('--test', action='store_true', help='运行测试模式')
     
     args = parser.parse_args()
     
     if args.test:
-        # 测试模式
         test_transition()
     else:
-        # 正常模式
-        print(f"输入目录: {args.input or '默认目录'}")
-        print(f"输出文件: {args.output or '默认文件名'}")
-        print(f"标题文本: {args.title}")
-        print(f"作者名称: {args.author or '无'}")
-        
         try:
-            # 确定输入目录（转换为绝对路径）
-            input_dir = os.path.abspath(args.input or "./11-23")
+            # 打印参数信息
+            print("\n🎬 开始处理视频...")
+            print(f"输入目录: {args.input_dir or '默认目录'}")
+            print(f"输出文件: {args.output_path or '默认输出.mp4'}")
+            print(f"标题: {args.title}")
+            print(f"作者: {args.author}")
+            print(f"颜色方案: {COLOR_SCHEMES[args.color_scheme]['name']}")
             
-            # 确定输出路径（始终放在输入目录下）
-            if args.output:
-                # 只使用文件名部分，忽略任何目录路径
-                output_filename = os.path.basename(args.output)
+            # 获取输入目录的绝对路径
+            input_dir = args.input_dir
+            if input_dir is None:
+                input_dir = os.path.abspath("./downloads")
+                print(f"\n⚠️ 未指定输入目录，使用默认目录: {input_dir}")
             else:
-                output_filename = f"{datetime.now().strftime('%m-%d')}_merged.mp4"
+                input_dir = os.path.abspath(input_dir)
             
-            # 构建最终输出路径（总是在输入目录下）
+            # 确保输入目录存在
+            if not os.path.exists(input_dir):
+                os.makedirs(input_dir)
+                print(f"\n📁 创建输入目录: {input_dir}")
+            
+            # 获取输出文件名（不包含路径）
+            if args.output_path:
+                # 只使用文件名部分，忽略任何路径
+                output_filename = os.path.basename(args.output_path)
+            else:
+                # 生成默认输出文件名
+                current_time = datetime.now().strftime("%m%d-%H%M")
+                output_filename = f"merged-video-{current_time}.mp4"
+                print(f"\n⚠️ 未指定输出文件，使用默认文件名: {output_filename}")
+            
+            # 构建最终输出路径（在输入目录中）
             final_output = os.path.join(input_dir, output_filename)
-            
-            print(f"最终输出路径: {final_output}")
+            print(f"\n📁 最终输出路径: {final_output}")
             
             # 运行合并
             merge_videos(
                 input_dir=input_dir,
                 output_path=final_output,
                 title=args.title,
-                author=args.author
+                author=args.author,
+                color_scheme=args.color_scheme
             )
             
             # 检查最终文件
             if os.path.exists(final_output):
                 print(f"\n✨ 视频合并完成！输出文件：{final_output}")
             else:
-                print(f"\n❌ 视频合并失败！文件未生成：{final_output}")
+                print("\n❌ 视频合并失败！")
+                
         except Exception as e:
-            print(f"\n❌ 视频合并失败：{str(e)}")
+            print(f"\n❌ 发生错误: {str(e)}")
+            logging.error(traceback.format_exc())

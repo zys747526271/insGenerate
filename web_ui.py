@@ -4,7 +4,7 @@ import json
 from typing import Optional, List
 import gradio as gr
 from video_downloader import download_videos, extract_instagram_links
-from video_merger import merge_videos
+from video_merger import merge_videos, COLOR_SCHEMES
 
 def download_only(links: str, output_folder: str) -> str:
     """仅下载视频"""
@@ -208,7 +208,7 @@ def create_ui():
                         video = next((v for v in videos_data if v['name'] == selected_name), None)
                         return video['path'] if video else None
                     
-                    def handle_merge(videos_data: List[dict], output_path: str, title: str, author: str):
+                    def handle_merge(videos_data: List[dict], output_path: str, title: str, author: str, color_scheme: str):
                         if not videos_data:
                             return "没有找到要合并的视频"
                         
@@ -231,26 +231,21 @@ def create_ui():
                                 for idx, video_path in enumerate(video_paths):
                                     new_name = f"{idx+1:03d}_{os.path.basename(video_path)}"
                                     new_path = os.path.join(temp_dir, new_name)
-                                    # 创建硬链接而不是复制文件，这样更快
                                     try:
                                         os.link(video_path, new_path)
                                     except OSError:
-                                        # 如果硬链接失败（例如跨设备），则复制文件
                                         import shutil
                                         shutil.copy2(video_path, new_path)
                                 
                                 # 使用临时目录进行合并，确保使用绝对路径
-                                merge_videos(temp_dir, output_path, title, author)
+                                merge_videos(temp_dir, output_path, title, author, color_scheme)
                                 
-                                # 确认输出文件存在
                                 if not os.path.exists(output_path):
                                     return f"合并失败：未找到输出文件 {output_path}"
                                 
-                                # 等待文件写入完成
                                 import time
-                                time.sleep(1)  # 给文件系统一点时间完成写入
+                                time.sleep(1)
                             
-                            # 再次确认文件存在并且大小大于0
                             if not os.path.exists(output_path) or os.path.getsize(output_path) == 0:
                                 return f"合并失败：输出文件无效 {output_path}"
                             
@@ -292,12 +287,35 @@ def create_ui():
                         placeholder="视频作者",
                         value="Cynvann"
                     )
+                    
+                    # 添加颜色方案选择下拉框
+                    color_scheme = gr.Dropdown(
+                        label="颜色方案",
+                        choices=[
+                            "p1 - 经典黑白",
+                            "p2 - 柔和灰白",
+                            "p3 - 暖色调",
+                            "p4 - 冷色调",
+                            "p5 - 现代灰白",
+                            "p6 - 经典白黑"
+                        ],
+                        value="p6 - 经典白黑",
+                        type="value"
+                    )
+                    
                     merge_btn = gr.Button("开始合并", variant="primary")
                     merge_output = gr.Textbox(label="合并结果")
                     
+                    # 处理颜色方案选择值
+                    def process_merge(*args):
+                        videos_data, output_path, title, author, color_scheme = args
+                        # 从选择值中提取颜色方案代码
+                        scheme_code = color_scheme.split(" - ")[0]
+                        return handle_merge(videos_data, output_path, title, author, scheme_code)
+                    
                     merge_btn.click(
-                        fn=handle_merge,
-                        inputs=[videos_state, output_path, title, author],
+                        fn=process_merge,
+                        inputs=[videos_state, output_path, title, author, color_scheme],
                         outputs=[merge_output]
                     )
 
