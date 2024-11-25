@@ -28,6 +28,9 @@ cd insGenerate
 pip install -r requirements.txt
 ```
 
+3. 创建cookies文件：
+登录Instagram，使用cookie editor或其他浏览器工具导出Netscape格式的cookies，并将cookies.txt保存到项目文件夹中。
+
 ### 基本使用
 
 #### 方式一：Web界面（推荐）
