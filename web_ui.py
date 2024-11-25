@@ -292,14 +292,14 @@ def create_ui():
                     color_scheme = gr.Dropdown(
                         label="颜色方案",
                         choices=[
-                            "p1 - 经典黑白",
-                            "p2 - 柔和灰白",
-                            "p3 - 暖色调",
-                            "p4 - 冷色调",
-                            "p5 - 现代灰白",
-                            "p6 - 经典白黑"
+                            f"p1 - 经典黑白 ({COLOR_SCHEMES['p1']['background']}/{COLOR_SCHEMES['p1']['text']})",
+                            f"p2 - 柔和灰白 ({COLOR_SCHEMES['p2']['background']}/{COLOR_SCHEMES['p2']['text']})",
+                            f"p3 - 暖色调 ({COLOR_SCHEMES['p3']['background']}/{COLOR_SCHEMES['p3']['text']})",
+                            f"p4 - 冷色调 ({COLOR_SCHEMES['p4']['background']}/{COLOR_SCHEMES['p4']['text']})",
+                            f"p5 - 现代灰白 ({COLOR_SCHEMES['p5']['background']}/{COLOR_SCHEMES['p5']['text']})",
+                            f"p6 - 经典白黑 ({COLOR_SCHEMES['p6']['background']}/{COLOR_SCHEMES['p6']['text']})"
                         ],
-                        value="p6 - 经典白黑",
+                        value=f"p6 - 经典白黑 ({COLOR_SCHEMES['p6']['background']}/{COLOR_SCHEMES['p6']['text']})",
                         type="value"
                     )
                     
