@@ -108,8 +108,8 @@ def create_ui():
         else:
             return [v["path"] for v in videos_data]
     
-    with gr.Blocks(title="Instagram视频批量下载器") as app:
-        gr.Markdown("# 📱 Instagram视频批量下载器")
+    with gr.Blocks(title="Instagram视频批量下载器 欢迎关注视频号@Cynvann") as app:
+        gr.Markdown("# 📱 Instagram视频批量下载器 欢迎关注视频号@Cynvann")
         
         with gr.Tabs():
             # 下载标签页
