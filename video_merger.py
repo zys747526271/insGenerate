@@ -146,37 +146,30 @@ def create_number_transition(number, duration=1.0, size=(720, 1280), is_final=Fa
                     # 计算文字总高度（包括间距）
                     total_text_height = title_height + 20 + date_bbox[3] - date_bbox[1]  # 20是两行文字间的间距
                     
-                    # 计算边框大小（确保4:3比例）
-                    padding = 20  # 文字到边框的间距
-                    min_width = max(title_width, date_width) + (padding * 2)  # 最小宽度
-                    min_height = total_text_height + (padding * 2)  # 最小高度
+                    # 计算整个标题框的尺寸
+                    padding = 20  # 文字和边框的间距
+                    box_width = max(title_width, date_width) + (padding * 2)
+                    box_height = total_text_height + (padding * 2)
                     
-                    # 确保4:3比例
-                    if (min_width / min_height) > (4 / 3):
-                        # 如果太宽，以宽度为准计算高度
-                        rect_width = min_width
-                        rect_height = rect_width * (3 / 4)
-                    else:
-                        # 如果太高，以高度为准计算宽度
-                        rect_height = min_height
-                        rect_width = rect_height * (4 / 3)
+                    # 计算标题框的位置（居中）
+                    box_x = (width - box_width) // 2
+                    box_y = circle_y - circle_radius - 320 - (box_height - total_text_height) // 2
                     
-                    # 计算边框位置
-                    rect_x = (width - rect_width) // 2
-                    rect_y = circle_y - circle_radius - 320 - (rect_height - total_text_height) // 2
-                    
-                    # 绘制白色边框
-                    rect_bbox = [rect_x, rect_y, rect_x + rect_width, rect_y + rect_height]
-                    draw.rectangle(rect_bbox, outline='white', width=2)
+                    # 绘制边框
+                    draw.rectangle(
+                        [box_x, box_y, box_x + box_width, box_y + box_height],
+                        outline='white',
+                        width=3
+                    )
                     
                     # 在边框内居中绘制日期
                     date_x = (width - date_width) // 2
-                    date_y = circle_y - circle_radius - 320  # 在圆上方320像素处
+                    date_y = box_y + padding
                     draw.text((date_x, date_y), date_text, font=title_font, fill='white')
                     
                     # 在日期下方居中绘制标题
                     title_x = (width - title_width) // 2
-                    title_y = date_y + title_height + 20  # 日期下方20像素
+                    title_y = date_y + title_height + padding  # 日期下方padding像素
                     draw.text((title_x, title_y), title_text, font=title_font, fill='white')
                     
                 except Exception as e:
@@ -402,7 +395,7 @@ def merge_videos(input_dir=None, output_path=None, title="今日份快乐", auth
                 pass
             
             # 删除过渡图片
-            for i in range(1, video_count + 1):
+            for i in range(1, video_count + 2):
                 try:
                     transition_file = f'transition_{i}.png'
                     if os.path.exists(transition_file):
