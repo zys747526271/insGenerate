@@ -2,6 +2,7 @@
 11-*/
 downloads/
 output/
+.gradio/
 
 # 忽略视频文件
 *.mp4
@@ -9,10 +10,12 @@ output/
 *.avi
 11-*.txt
 
+
 # 忽略Cookie和敏感信息
 cookies.txt
 *.cookie
 *.cookies
+*.log
 
 # Python
 __pycache__/
@@ -36,6 +39,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+*.log
 
 # IDE
 .idea/

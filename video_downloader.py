@@ -54,17 +54,29 @@ def get_instagram_cookies():
         print(f"获取cookies时出错: {str(e)}")
         return None
 
-def extract_instagram_links(file_path):
-    """从文本文件中提取 Instagram 链接"""
+def extract_instagram_links(file_path: str) -> list:
+    """从文件或文本中提取Instagram链接"""
     try:
-        with open(file_path, 'r', encoding='utf-8') as file:
-            content = file.read()
-            # 匹配 Instagram 链接的正则表达式，包括查询参数
-            pattern = r'https?://(?:www\.)?instagram\.com/reel/[^/\s]+/?\?[^\s"\')]+|https?://(?:www\.)?instagram\.com/p/[^/\s]+/?\?[^\s"\')]+|https?://(?:www\.)?instagram\.com/reels/[^/\s]+/?\?[^\s"\')]+|https?://(?:www\.)?instagram\.com/stories/[^/\s]+/?\?[^\s"\')]+|https?://(?:www\.)?instagram\.com/tv/[^/\s]+/?\?[^\s"\')]+|https?://(?:www\.)?instagram\.com/[^/\s]+/[^/\s]+/?\?[^\s"\')]+|https?://(?:www\.)?instagram\.com/[^/\s]+/?\?[^\s"\')]+|https?://(?:www\.)?instagram\.com/[^/\s]+/[^/\s]+/?'
-            links = re.findall(pattern, content)
-            return links
+        # 如果是文件路径，读取文件内容
+        if os.path.isfile(file_path):
+            with open(file_path, 'r', encoding='utf-8') as file:
+                content = file.read()
+        else:
+            # 如果不是文件，直接使用输入的文本
+            content = file_path
+        
+        # 匹配 Instagram 链接的正则表达式，包括查询参数
+        pattern = r'https?://(?:www\.)?instagram\.com/reel/[^/\s]+/?\?[^\s"\')]+|https?://(?:www\.)?instagram\.com/p/[^/\s]+/?\?[^\s"\')]+|https?://(?:www\.)?instagram\.com/reels/[^/\s]+/?\?[^\s"\')]+|https?://(?:www\.)?instagram\.com/stories/[^/\s]+/?\?[^\s"\')]+|https?://(?:www\.)?instagram\.com/tv/[^/\s]+/?\?[^\s"\')]+|https?://(?:www\.)?instagram\.com/[^/\s]+/[^/\s]+/?\?[^\s"\')]+|https?://(?:www\.)?instagram\.com/[^/\s]+/?\?[^\s"\')]+|https?://(?:www\.)?instagram\.com/[^/\s]+/[^/\s]+/?'
+        links = re.findall(pattern, content)
+        
+        if links:
+            print(f"找到 {len(links)} 个链接:")
+            for link in links:
+                print(f"- {link}")
+        
+        return links
     except Exception as e:
-        print(f"读取文件时出错: {str(e)}")
+        print(f"提取链接时出错: {str(e)}")
         return []
 
 def download_videos(links, output_path='downloads'):
@@ -114,7 +126,7 @@ def download_videos(links, output_path='downloads'):
 
 if __name__ == "__main__":
     # 指定包含链接的文本文件路径
-    links_file = "11-23.txt"  # 你可以修改为实际的文件路径
+    links_file = "11-25.txt"  # 你可以修改为实际的文件路径
     
     # 使用txt文件名（不包括扩展名）作为输出目录
     output_folder = os.path.splitext(os.path.basename(links_file))[0]
