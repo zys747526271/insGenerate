@@ -287,6 +287,8 @@ def merge_videos(input_dir=None, output_path=None, title="今日份快乐", auth
                 # 添加错误处理和重试机制
                 try:
                     video = VideoFileClip(video_file)
+                    # 强制调整视频尺寸为 720x1280
+                    video = video.resize((720, 1280))
                     if video.duration > 0:  # 确保视频长度有效
                         # 获取实际可用的持续时间
                         actual_duration = video.duration
@@ -298,7 +300,8 @@ def merge_videos(input_dir=None, output_path=None, title="今日份快乐", auth
                 except Exception as e:
                     logging.warning(f"视频加载出错，尝试备用方案: {str(e)}")
                     # 备用方案：使用ffmpeg-python直接加载
-                    video = VideoFileClip(video_file, target_resolution=(720, 1280))
+                    video = VideoFileClip(video_file)
+                    video = video.resize((720, 1280))
                     if video.duration > 1:
                         video = video.subclip(0, video.duration - 0.5)
                 
