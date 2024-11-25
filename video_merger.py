@@ -235,8 +235,9 @@ def merge_videos(input_dir=None, output_path=None, title="今日份快乐", auth
         # 处理输出路径
         if output_path is None:
             output_path = os.path.join(input_dir, f"{datetime.now().strftime('%m-%d')}_merged.mp4")
-        elif not os.path.isabs(output_path):
-            output_path = os.path.join(input_dir, os.path.basename(output_path))
+        else:
+            # 如果提供了输出路径，使用它的绝对路径
+            output_path = os.path.abspath(output_path)
 
         # 创建输出目录（如果不存在）
         output_dir = os.path.dirname(output_path)
