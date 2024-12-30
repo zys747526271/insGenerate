@@ -83,11 +83,11 @@ def download_videos(links, output_path='downloads'):
     """下载视频"""
     if not os.path.exists(output_path):
         os.makedirs(output_path)
-
+    timestamp = time.time()
     # 下载配置
     ydl_opts = {
         'format': 'best',
-        'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),
+        'outtmpl': os.path.join(output_path, '%(title)s%(timestamp)s.%(ext)s'),
         'ignoreerrors': True,
         'quiet': False,
         'no_warnings': False,
@@ -126,7 +126,7 @@ def download_videos(links, output_path='downloads'):
 
 if __name__ == "__main__":
     # 指定包含链接的文本文件路径
-    links_file = "11-25.txt"  # 你可以修改为实际的文件路径
+    links_file = "links.txt"  # 你可以修改为实际的文件路径
     
     # 使用txt文件名（不包括扩展名）作为输出目录
     output_folder = os.path.splitext(os.path.basename(links_file))[0]
